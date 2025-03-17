@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác nhận Gmail</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        input {
+            padding: 10px;
+            margin: 10px 0;
+            width: 100%;
+        }
+        button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #218838;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="emailContainer">
+        <h2>Nhập Gmail của bạn</h2>
+        <input type="email" id="email" placeholder="Nhập Gmail" required>
+        <button id="confirmBtn" onclick="verifyEmail()">Xác nhận</button>
+        <p id="message"></p>
+    </div>
+
+    <script>
+        function verifyEmail() {
+            let emailInput = document.getElementById('email');
+            let confirmBtn = document.getElementById('confirmBtn');
+            let message = document.getElementById('message');
+            let emailPattern = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+            let email = emailInput.value.trim();
+            
+            let submittedEmails = JSON.parse(localStorage.getItem('submittedEmails')) || [];
+
+            if (submittedEmails.includes(email)) {
+                message.style.color = 'red';
+                message.textContent = 'Email này đã được sử dụng!';
+                return;
+            }
+
+            if (emailPattern.test(email)) {
+                submittedEmails.push(email);
+                localStorage.setItem('submittedEmails', JSON.stringify(submittedEmails));
+                localStorage.setItem('emailUsed', 'true'); // Đánh dấu đã nhập email
+
+                message.style.color = 'green';
+                message.textContent = 'Gmail hợp lệ! Đang chuyển hướng...';
+                emailInput.disabled = true;
+                confirmBtn.disabled = true;
+                
+                setTimeout(() => {
+                    window.location.href = 'lucky_spin.html'; // Chuyển hướng sau 1 giây
+                }, 1000);
+            } else {
+                message.style.color = 'red';
+                message.textContent = 'Vui lòng nhập Gmail hợp lệ (ví dụ: example@gmail.com)';
+            }
+        }
+
+        // Kiểm tra nếu đã nhập email trước đó để chặn nhập lại
+        window.onload = function () {
+            let emailInput = document.getElementById('email');
+            let confirmBtn = document.getElementById('confirmBtn');
+            let message = document.getElementById('message');
+
+            if (localStorage.getItem('emailUsed') === 'true') {
+                emailInput.disabled = true;
+                confirmBtn.disabled = true;
+                message.style.color = 'red';
+                message.textContent = "Bạn đã nhập Gmail, không thể nhập lại!";
+            }
+        };
+    </script>
+</body>
+</html>
